@@ -57,6 +57,7 @@
     <Compile Include="IO\Parsing\Tokenization\TokenizerPhaseEx.cs" />
     <Compile Include="IO\Parsing\Tokenization\TokenizerResult.cs" />
     <Compile Include="IO\Parsing\Tokenization\TokenizerValidationResult.cs" />
+    <Compile Include="IO\SentenceFormats\PhiSentence.cs" />
     <Compile Include="Mathmatics\MathHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Core\Threading\AsyncObjectWait.cs" />
