@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.30723.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Phi", "Phi\Phi.csproj", "{828EBFD1-4645-4C38-8C48-652F3796EADE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Phi.Test", "Phi.Test\Phi.Test.csproj", "{4B0A864F-9E84-4528-A8BB-AA4DC7CCB3C6}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{828EBFD1-4645-4C38-8C48-652F3796EADE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{828EBFD1-4645-4C38-8C48-652F3796EADE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{828EBFD1-4645-4C38-8C48-652F3796EADE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{828EBFD1-4645-4C38-8C48-652F3796EADE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4B0A864F-9E84-4528-A8BB-AA4DC7CCB3C6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4B0A864F-9E84-4528-A8BB-AA4DC7CCB3C6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4B0A864F-9E84-4528-A8BB-AA4DC7CCB3C6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4B0A864F-9E84-4528-A8BB-AA4DC7CCB3C6}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
