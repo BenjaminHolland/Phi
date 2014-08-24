@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Win32.SafeHandles;
 using System.Runtime.InteropServices;
+using System.ComponentModel;
 using System.IO;
 using Phi.Core;
 using Phi.Core.Development;
@@ -18,12 +19,14 @@ namespace Phi.Interop.Win32 {
     }
     /// <summary>
     /// Class used to buffer and manipulate data provided by native handles. This class does not own the handle. 
+    /// This class is SUPER not thread safe.
     /// </summary>
     [TODO("Document class")]
-    public class PageCache {
+    
+    public class PageCache:DisposableObject {
 #if DEBUG
         public static readonly SafeFileHandle TestHandle = _createTestHandle();
-        
+       
             private static SafeFileHandle _createTestHandle(){
                 SafeFileHandle ret=FileIO.NativeMethods.CreateFile("PageCacheTestMemory", Phi.Interop.Win32.FileIO.FileAccess.GenericRead|Phi.Interop.Win32.FileIO.FileAccess.GenericWrite, FileIO.FileShare.Read | FileIO.FileShare.Write, default(IntPtr), FileIO.CreationDisposition.CreateAlways, FileIO.FileAttributes.Normal, IntPtr.Zero);
                 AlignedNativeBuffer buffer=new AlignedNativeBuffer(1024,8);
@@ -44,14 +47,7 @@ namespace Phi.Interop.Win32 {
             TestHandle.Dispose();
         }
 #endif
-        public PageBufferErrorStates ErrorState {
-            get;
-            protected set;
-        }
-        public Int32 LastErrorCode {
-            get;
-            protected set;
-        }
+       
         private AlignedNativeBuffer _page;
         private UInt32 _pageSize;
         private UInt32 _blockSize;
@@ -105,67 +101,63 @@ namespace Phi.Interop.Win32 {
             ulong blockIdxInPage = (uint)(blockIdx - firstBlockInPage);
             return (Int32)(blockIdxInPage * _blockSize);
         }
-        private unsafe bool _writeTo(UInt32 pageIdx) {
-            bool success = false;
-            long retPtr;
+        private const string _FLUSH_FAILED_MSG_FMT = "Flush Failed: pageIdx={0} retBytes={1}";
+        private const string _SEEK_FAILED_MSG_FMT = "Seek Failed: pageIdx={0} retPtr={1}";
+        private const string _BUFFER_FAILED_MSG_FMT = "Buffer Failed: pageIdx={0} retBytes={1}";
+        private unsafe void _flushTo(UInt32 pageIdx) {
+            int lastError;
+            long retPtr=0;
             uint retBytes = 0;
-            if(!FileIO.NativeMethods.SeekFile(_handle,pageIdx*_pageSize,out retPtr,FileIO.FileSeekMethod.FileBegin)){
-                LastErrorCode=Marshal.GetLastWin32Error();
-                ErrorState=PageBufferErrorStates.WriteFailure;
+            bool success = FileIO.NativeMethods.SeekFile(_handle, pageIdx * _pageSize, out retPtr, FileIO.FileSeekMethod.FileBegin);
+            lastError = Marshal.GetLastWin32Error();
+            if(!success){
+                throw new IOException(String.Format(_SEEK_FAILED_MSG_FMT, pageIdx,retPtr), new Win32Exception(lastError));
             }else{
-                if (!FileIO.NativeMethods.WriteFile(_handle, _page, _pageSize, out retBytes, null)) {
-                    LastErrorCode = Marshal.GetLastWin32Error();
-                    ErrorState = PageBufferErrorStates.WriteFailure;
+                success = FileIO.NativeMethods.WriteFile(_handle, _page, _pageSize, out retBytes, null);
+                lastError = Marshal.GetLastWin32Error();
+                if (!success) {
+                    throw new IOException(String.Format(_FLUSH_FAILED_MSG_FMT, pageIdx, retBytes), new Win32Exception(lastError));
                 }
                 else {
-                    if (retBytes == _pageSize) {
-                        success = true;
-                    }
-                    else {
-                        ErrorState = PageBufferErrorStates.WriteFailure;
+                    if (retBytes != _pageSize) {
+                        throw new IOException(String.Format(_FLUSH_FAILED_MSG_FMT, pageIdx, retBytes), new Win32Exception(lastError));
                     }
                 }
             }
-            return success;
         }
-        private unsafe bool _readFrom(UInt32 pageIdx) {
-            bool success = false;
+        private unsafe void _bufferFrom(UInt32 pageIdx) {
+            int lastError;
             long retPtr;
             uint retBytes=0;
-            if(!FileIO.NativeMethods.SeekFile(_handle,pageIdx*_pageSize,out retPtr,FileIO.FileSeekMethod.FileBegin)){
-                LastErrorCode=Marshal.GetLastWin32Error();
-                ErrorState=PageBufferErrorStates.ReadFailure;
+            bool success = FileIO.NativeMethods.SeekFile(_handle,pageIdx*_pageSize,out retPtr,FileIO.FileSeekMethod.FileBegin);
+            lastError = Marshal.GetLastWin32Error();
+            if(!success){
+                throw new IOException(String.Format(_SEEK_FAILED_MSG_FMT, pageIdx, retPtr), new Win32Exception(lastError));
             }else{
-                _pageIdx=pageIdx;
-                if(!FileIO.NativeMethods.ReadFile(_handle,_page,_pageSize,out retBytes,null)){
-                    LastErrorCode=Marshal.GetLastWin32Error();
-                    ErrorState=PageBufferErrorStates.ReadFailure;
+                _pageIdx = pageIdx;
+                success = FileIO.NativeMethods.ReadFile(_handle, _page, _pageSize, out retBytes, null);
+                lastError = Marshal.GetLastWin32Error();
+                if(!success){
+                    throw new IOException(String.Format(_BUFFER_FAILED_MSG_FMT, pageIdx, retBytes), new Win32Exception(lastError));
                 }else{
-                    if(retBytes==_pageSize){
-                        success=true;
-                    }else{
-                        ErrorState=PageBufferErrorStates.ReadFailure;
+                    if(retBytes!=_pageSize){
+                        throw new IOException(String.Format(_BUFFER_FAILED_MSG_FMT, pageIdx, retBytes), new Win32Exception(lastError));
                     }
                 }
-            }
-            return success;
+            }      
         }        
         private void _throwIfBadHandle() {
             if (_handle.IsClosed || _handle.IsInvalid) {
                 throw new InvalidOperationException("Invalid Handle");
             }
         }
-        private void _throwIfError() {
-            if (ErrorState != PageBufferErrorStates.None) {
-                throw new InvalidOperationException(String.Format("Page Buffer Errored: {0}", ErrorState));
-            }
-        }
+        private const string BadHandleMsg = "Bad Handle";
         private void _checkConstructor(SafeFileHandle handle, int alignment, int blockSize, int blocksPerPage) {
             if (handle.IsClosed || handle.IsInvalid) {
-                throw new ArgumentException("Bad Handle");
+                throw new ArgumentException(BadHandleMsg);
             }
             if (handle == null) {
-                throw new ArgumentNullException("handle");
+                throw new ArgumentNullException(BadHandleMsg);
             }
             if (alignment < 1) {
                 throw new ArgumentException("Invalid alignment");
@@ -183,16 +175,11 @@ namespace Phi.Interop.Win32 {
         }
         public UnmanagedMemoryAccessor AccessBlock(UInt64 blockIdx, FileAccess method = FileAccess.Read) {
             _throwIfBadHandle();
-            _throwIfError();
             if (!_isBlockInPage(blockIdx)) {
                 if (_needsFlush) {
-                    if (!_writeTo(_pageIdx)) {
-                        throw new InvalidOperationException("Flush Failed");
-                    }
+                    _flushTo(_pageIdx);    
                 }
-                if (!_readFrom(_indexOfPageContaining(blockIdx))) {
-                    throw new InvalidOperationException("Read Failed");
-                }
+                _bufferFrom(_indexOfPageContaining(blockIdx));
             }
             if (method.HasFlag(FileAccess.Write)) {
                 _needsFlush = true;
@@ -201,21 +188,19 @@ namespace Phi.Interop.Win32 {
         }
         public UnmanagedMemoryStream StreamBlock(UInt64 block, FileAccess method = FileAccess.Read) {
             _throwIfBadHandle();
-            _throwIfError();
             if (!_isBlockInPage(block)) {
                 if (_needsFlush) {
-                    if (!_writeTo(_pageIdx)) {
-                        throw new InvalidOperationException("Flush Failed");
-                    }
+                    _flushTo(_pageIdx);
                 }
-                if (!_readFrom(_indexOfPageContaining(block))) {
-                    throw new InvalidOperationException("Read Failed");
-                }
+                _bufferFrom(_indexOfPageContaining(block));
             }
             if (method.HasFlag(FileAccess.Write)) {
                 _needsFlush = true;
             }
             return new UnmanagedMemoryStream(_page, _firstByteInBlock(block), _blockSize, method);
+        }
+        public void Flush() {
+            _flushTo(_pageIdx);
         }
         public PageCache(SafeFileHandle handle, Int32 alignment, Int32 blockSize, Int32 blocksPerPage) {
             _checkConstructor(handle, alignment, blockSize, blocksPerPage);
@@ -225,7 +210,16 @@ namespace Phi.Interop.Win32 {
             _pageIdx = 0;
             _needsFlush = false;
             _blockSize = (uint)blockSize;
-            _readFrom(0);
+            _bufferFrom(0);
+        }
+        protected override void DisposeUnmanagedResources() {
+            _page.Dispose();
+            base.DisposeUnmanagedResources();
+        }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1063:ImplementIDisposableCorrectly")]
+        ~PageCache() {
+            Dispose(false);
+            GC.SuppressFinalize(this);
         }
     }
 }

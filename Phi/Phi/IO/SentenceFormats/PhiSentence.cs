@@ -23,7 +23,6 @@ namespace Phi.IO {
         }
     }
     [Phi.Core.Development.TODO("Test Class")]
-    
     public class PhiStartPhase:TokenizerPhaseEx{
         internal TokenizerValidationResult CompleteResult = TokenizerValidationResult.Create(TokenizerSentenceAtion.Continue, TokenizerPhaseAction.Complete, TokenizerCharacterAction.Add);
         internal TokenizerValidationResult FailureResult = TokenizerValidationResult.CreateFailure();

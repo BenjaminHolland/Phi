@@ -19,9 +19,21 @@ namespace Phi.Test {
             Console.WriteLine(AppDomain.CurrentDomain.BaseDirectory);
             PageCache cache = new PageCache(PageCache.TestHandle, 8, 512, 1);
             cache.AccessBlock(0, System.IO.FileAccess.Write).Write(0,(ushort)0xFFFF);
-            cache.AccessBlock(1, System.IO.FileAccess.Read);
+            cache.AccessBlock(1);
             Assert.AreEqual((ushort)0xFFFF, cache.AccessBlock(0).ReadUInt16(0));
-            
+            cache.AccessBlock(2);
+            PageCache.Shutdown();
+        }
+        [System.Diagnostics.Conditional("DEBUG")]
+        [TestMethod]
+        [TestCategory("Phi.Interop.Win32.PageCache")]
+        public void PageCacheThreadedTest() {
+            PageCache cache = new PageCache(PageCache.TestHandle, 8, 512, 1);
+            cache.AccessBlock(0, System.IO.FileAccess.Write).Write(0, (ushort)0xFFFF);      
+            System.Threading.Tasks.Parallel.For(0,2,(i)=>{
+                cache.AccessBlock((ulong)i, System.IO.FileAccess.ReadWrite).Write(0, (ushort)0xFFFF);
+            });
+            Assert.AreEqual((ushort)0xFFFF,cache.AccessBlock)
             PageCache.Shutdown();
         }
     }

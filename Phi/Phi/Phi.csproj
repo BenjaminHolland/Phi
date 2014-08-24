@@ -45,6 +45,8 @@
     <Compile Include="Core\BitConverterEx.cs" />
     <Compile Include="Core\Development\TODOAttribute.cs" />
     <Compile Include="Core\DisposableObject.cs" />
+    <Compile Include="Core\Optional.cs" />
+    <Compile Include="Core\Threading\AsyncOp.cs" />
     <Compile Include="Interop\Win32\DeviceIO.NativeMethods.cs" />
     <Compile Include="Interop\Win32\FileIO.NativeMethods.cs" />
     <Compile Include="Interop\Win32\AlignedNativeBuffer.cs" />
