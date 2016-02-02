@@ -9,7 +9,7 @@ using System.Reactive;
 using System.Reactive.Subjects;
 using System.Reactive.Linq;
 using System.Reactive.Concurrency;
-namespace Phi.IO.Devices.ReactivePort
+namespace Phi.IO.Devices
 {
     public sealed class ReactivePort : IDisposable {
         private SerialPortStream _port;
@@ -282,7 +282,11 @@ namespace Phi.IO.Devices.ReactivePort
                 _port.PortName = value;
             }
         }
-
+        public bool IsOpen {
+            get {
+                return _port.IsOpen;
+            }
+        }
         public void Open() {
             if (_port.IsOpen) return;
             _port.Open();

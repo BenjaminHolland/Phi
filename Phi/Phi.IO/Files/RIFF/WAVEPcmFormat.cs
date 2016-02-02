@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Phi.IO.Files.RIFF.WAVE {
+namespace Phi.IO.Files.RIFF{
     public class WAVEPcmFormat : WAVEFormatBase {
         public WAVEPcmFormat(ushort channels, uint sampleRate, ushort bitDepth) :
             base(RIFFWaveType.PCM, channels, sampleRate) {

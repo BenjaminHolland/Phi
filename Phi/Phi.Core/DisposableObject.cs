@@ -17,6 +17,9 @@ namespace Phi.Core {
             base() {
         }
     }
+    /// <summary>
+    /// An extention to IDisposable
+    /// </summary>
     public interface IDisposableObject : IDisposable {
         bool IsDisposed {
             get;
@@ -24,7 +27,43 @@ namespace Phi.Core {
         event EventHandler<DisposingEventArgs> Disposing;
         event EventHandler<DisposedEventArgs> Disposed;
     }
+
+    public sealed class DisposalWrapper : DisposableObject {
+        private Action _managedDisposal;
+        private Action _unmanagedDisposal;
+        public DisposalWrapper(IDisposable target) {
+            _managedDisposal = target.Dispose;
+        }
+        public DisposalWrapper(Action disposeManaged,Action disposeUnmanaged) {
+
+            _managedDisposal = disposeManaged;
+            _unmanagedDisposal = disposeUnmanaged;
+            
+        }
+        protected override void DisposeUnmanagedResources() {
+            if (_unmanagedDisposal != null) {
+                _unmanagedDisposal();
+            }
+            base.DisposeUnmanagedResources();
+        }
+        protected override void DisposeManagedResources() {
+
+            _managedDisposal();
+            base.DisposeManagedResources();
+        }
+    }
+    /// <summary>
+    /// Provides premade functionality for the IDisposableObject interface.
+    /// </summary>
     public class DisposableObject : IDisposableObject {
+        /// <summary>
+        /// Wraps an object 
+        /// </summary>
+        /// <param name="disposable">The disposable to wrap.</param>
+        /// <returns>A DisposableO</returns>
+        public static IDisposableObject FromDisposable(IDisposable disposable) {
+            return new DisposalWrapper(disposable);
+        }
         private bool _isDisposed;
         
         public virtual bool IsDisposed {

@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Phi.IO.Files.RIFF.WAVE {
+namespace Phi.IO.Files.RIFF {
     public abstract class WAVEFormatBase : RIFFBase {
         private ushort _formatTag;
         private ushort _channels;

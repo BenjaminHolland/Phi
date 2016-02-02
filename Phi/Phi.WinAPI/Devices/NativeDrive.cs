@@ -14,11 +14,20 @@ namespace Phi.IO.Devices {
         private bool _isDisposed;
         public void Dispose() {
             if (!_isDisposed) {
+                try {
+                    uint bytes = 0;
+                    if (!Kernel32.DeviceIOControl(_handle.DangerousGetHandle(), NativeDeviceIOControlCode.FsctlUnlockVolume, IntPtr.Zero, 0, IntPtr.Zero, 0, ref bytes, IntPtr.Zero)){
+                        throw new Win32Exception();
+                    }
+                }
+                finally {
 
-                //Console.WriteLine("Disposing");
-                _isDisposed = true;
-                //Kernel32.CloseHandle(_handle.DangerousGetHandle());
-                _handle.Dispose();
+                    //Console.WriteLine("Disposing");
+                    _isDisposed = true;
+
+                    //Kernel32.CloseHandle(_handle.DangerousGetHandle());
+                    _handle.Dispose();
+                }
             }
         }
         unsafe static void DriveTransferComplete(uint errorCode, uint bytesRead, NativeOverlapped* npOverlapped) {

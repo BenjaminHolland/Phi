@@ -79,6 +79,8 @@
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Phi.Core.Interop.GlobalBuffer.cs" />
+    <Compile Include="Phi.IO.Devices.NativeDrive.cs" />
+    <Compile Include="Phi.IO.Devices.ReactivePort.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Phi.Core\Phi.Core.csproj">

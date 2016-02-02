@@ -29,5 +29,6 @@ namespace Phi.Core.Interop.Test {
             GlobalBuffer buffer = new GlobalBuffer(1, 13);
             Assert.AreEqual(0, buffer.DangerousGetHandle().ToInt32() % 13);
         }
+        
     }
 }
