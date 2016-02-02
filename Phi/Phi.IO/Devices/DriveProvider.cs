@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Phi.IO.Devices {
-    public class DriveProvider : IDisposable {
+    public sealed class DriveProvider : IDisposable {
         #region Lifetime
         private static Lazy<DriveProvider> _instance = new Lazy<DriveProvider>(() => new DriveProvider());
         public static DriveProvider Current {

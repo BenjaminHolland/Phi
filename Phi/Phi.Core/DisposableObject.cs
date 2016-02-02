@@ -5,13 +5,13 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Phi.Core {
-    public class DisposedEventArgs : EventArgs {
+    public sealed class DisposedEventArgs : EventArgs {
         public static readonly DisposedEventArgs Current=new DisposedEventArgs();
         public DisposedEventArgs()
             : base() {
         }
     }
-    public class DisposingEventArgs : EventArgs {
+    public sealed class DisposingEventArgs : EventArgs {
         public static readonly DisposingEventArgs Current = new DisposingEventArgs();
         public DisposingEventArgs() :
             base() {
@@ -24,9 +24,9 @@ namespace Phi.Core {
         event EventHandler<DisposingEventArgs> Disposing;
         event EventHandler<DisposedEventArgs> Disposed;
     }
-    public abstract class DisposableObject : IDisposableObject {
+    public class DisposableObject : IDisposableObject {
         private bool _isDisposed;
-
+        
         public virtual bool IsDisposed {
             get {
                 return _isDisposed;
@@ -37,36 +37,38 @@ namespace Phi.Core {
         }
         public event EventHandler<DisposingEventArgs> Disposing;
         public event EventHandler<DisposedEventArgs> Disposed;
-        protected virtual void OnDisposed() {
+        protected void ThrowIfDisposed() {
+            if (_isDisposed) throw new ObjectDisposedException(ToString());
+        }
+        protected virtual void RaiseDisposed() {
             if (Disposed != null) {
                 Disposed(null, DisposedEventArgs.Current);
             }
         }
-        protected virtual void OnDisposing() {
+        protected virtual void RaiseDisposing() {
             if (Disposing != null) {
                 Disposing(this, DisposingEventArgs.Current);
             }
         }
         protected virtual void Dispose(bool disposing) {
             if (!_isDisposed) {
-                OnDisposing();
+                RaiseDisposing();
                 if (disposing) {
                     DisposeManagedResources();
                 }
                 DisposeUnmanagedResources();
                 IsDisposed = true;
-                OnDisposed();
+                RaiseDisposed();
             }
         }
-        protected virtual void DisposeManagedResources() {
-
-        }
-        protected virtual void DisposeUnmanagedResources() {
-
-        }
+        protected virtual void DisposeManagedResources() { }
+        protected virtual void DisposeUnmanagedResources() { }
         public void Dispose() {
             Dispose(true);
             GC.SuppressFinalize(this);
+        }
+        ~DisposableObject() {
+            Dispose(false);
         }
     }
 }

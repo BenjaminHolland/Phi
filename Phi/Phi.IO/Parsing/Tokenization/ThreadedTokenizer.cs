@@ -7,10 +7,7 @@ using System.Threading.Tasks;
 using System.Threading;
 using System.ComponentModel;
 namespace Phi.IO.Parsing.Tokenization {
-    [Phi.Core.Development.TODO("Create Success and Failure events and delegates.")]
-    [Phi.Core.Development.TODO("Add additional failure information to Failure delegate")]
-    [Phi.Core.Development.TODO("Possibly add an option to invoke events on a custom System.Windows.Threading.Dispatcher")]
-    public class ThreadedTokenizer:Phi.Core.DisposableObject{
+public class ThreadedTokenizer:Phi.Core.DisposableObject{
         private enum ThreadedTokenizerState {
             Processing,
             Succeded,

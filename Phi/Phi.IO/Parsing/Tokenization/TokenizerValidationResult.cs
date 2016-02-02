@@ -77,7 +77,7 @@ namespace Phi.IO.Parsing.Tokenization {
     /// The result of a TokenizerPhase.Validate() call. 
     /// </summary>
     /// 
-    [Phi.Core.Development.TODO("Cache all different values of TokenizerValidatorResult and return those rather than making a new one each time.")]
+  
     public class TokenizerValidationResult {
         TokenizerCharacterAction _characterAction;
         TokenizerPhaseAction _phaseAction;
