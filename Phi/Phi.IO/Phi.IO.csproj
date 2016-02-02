@@ -1,15 +1,15 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{828EBFD1-4645-4C38-8C48-652F3796EADE}</ProjectGuid>
+    <ProjectGuid>{EACCEE78-359A-47D2-9DD9-97154ECDE13D}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Phi</RootNamespace>
-    <AssemblyName>Phi</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <RootNamespace>Phi.IO</RootNamespace>
+    <AssemblyName>Phi.IO</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -20,7 +20,6 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -37,34 +36,32 @@
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Core\BindableDisposableObject.cs" />
-    <Compile Include="Core\BindableObject.cs" />
-    <Compile Include="Core\BitConverterEx.cs" />
-    <Compile Include="Core\Development\TODOAttribute.cs" />
-    <Compile Include="Core\DisposableObject.cs" />
-    <Compile Include="Core\Optional.cs" />
-    <Compile Include="Core\Threading\AsyncOp.cs" />
-    <Compile Include="Interop\Win32\DeviceIO.NativeMethods.cs" />
-    <Compile Include="Interop\Win32\FileIO.NativeMethods.cs" />
-    <Compile Include="Interop\Win32\AlignedNativeBuffer.cs" />
-    <Compile Include="Interop\Win32\PageCache.cs" />
-    <Compile Include="IO\HexReader.cs" />
-    <Compile Include="IO\Parsing\HexParser.cs" />
-    <Compile Include="IO\Parsing\Tokenization\ThreadedTokenizer.cs" />
-    <Compile Include="IO\Parsing\Tokenization\StandardTokenizer.cs" />
-    <Compile Include="IO\Parsing\Tokenization\TokenizerPhase.cs" />
-    <Compile Include="IO\Parsing\Tokenization\TokenizerPhaseEx.cs" />
-    <Compile Include="IO\Parsing\Tokenization\TokenizerResult.cs" />
-    <Compile Include="IO\Parsing\Tokenization\TokenizerValidationResult.cs" />
-    <Compile Include="IO\SentenceFormats\PhiSentence.cs" />
-    <Compile Include="Mathmatics\MathHelper.cs" />
+    <Compile Include="DriveProvider.cs" />
+    <Compile Include="Files\RIFF\RIFFBase.cs" />
+    <Compile Include="Files\RIFF\RIFFContainer.cs" />
+    <Compile Include="Files\RIFF\RIFFList.cs" />
+    <Compile Include="Files\RIFF\RIFFRoot.cs" />
+    <Compile Include="Files\RIFF\RIFFState.cs" />
+    <Compile Include="Files\RIFF\WAVECueList.cs" />
+    <Compile Include="Files\RIFF\WAVEDataBase.cs" />
+    <Compile Include="Files\RIFF\WAVEFormat.cs" />
+    <Compile Include="Files\RIFF\WAVEFormatBase.cs" />
+    <Compile Include="Files\RIFF\WAVEPcmData.cs" />
+    <Compile Include="Files\RIFF\WAVEPcmFormat.cs" />
+    <Compile Include="Parsing\HexParser.cs" />
+    <Compile Include="Parsing\SentenceFormats\PhiSentence.cs" />
+    <Compile Include="Parsing\Tokenization\StandardTokenizer.cs" />
+    <Compile Include="Parsing\Tokenization\ThreadedTokenizer.cs" />
+    <Compile Include="Parsing\Tokenization\TokenizerPhase.cs" />
+    <Compile Include="Parsing\Tokenization\TokenizerPhaseEx.cs" />
+    <Compile Include="Parsing\Tokenization\TokenizerResult.cs" />
+    <Compile Include="Parsing\Tokenization\TokenizerValidationResult.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Core\Threading\AsyncObjectWait.cs" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

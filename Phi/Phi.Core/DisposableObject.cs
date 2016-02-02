@@ -6,16 +6,23 @@ using System.Threading.Tasks;
 
 namespace Phi.Core {
     public class DisposedEventArgs : EventArgs {
+        public static readonly DisposedEventArgs Current=new DisposedEventArgs();
         public DisposedEventArgs()
             : base() {
         }
     }
-    public delegate void DisposedEventHandler(object sender, DisposedEventArgs e);
+    public class DisposingEventArgs : EventArgs {
+        public static readonly DisposingEventArgs Current = new DisposingEventArgs();
+        public DisposingEventArgs() :
+            base() {
+        }
+    }
     public interface IDisposableObject : IDisposable {
         bool IsDisposed {
             get;
         }
-        event DisposedEventHandler Disposed;
+        event EventHandler<DisposingEventArgs> Disposing;
+        event EventHandler<DisposedEventArgs> Disposed;
     }
     public abstract class DisposableObject : IDisposableObject {
         private bool _isDisposed;
@@ -28,15 +35,21 @@ namespace Phi.Core {
                 _isDisposed = value;
             }
         }
-        public event DisposedEventHandler Disposed;
-
+        public event EventHandler<DisposingEventArgs> Disposing;
+        public event EventHandler<DisposedEventArgs> Disposed;
         protected virtual void OnDisposed() {
             if (Disposed != null) {
-                Disposed(null, new DisposedEventArgs());
+                Disposed(null, DisposedEventArgs.Current);
+            }
+        }
+        protected virtual void OnDisposing() {
+            if (Disposing != null) {
+                Disposing(this, DisposingEventArgs.Current);
             }
         }
         protected virtual void Dispose(bool disposing) {
             if (!_isDisposed) {
+                OnDisposing();
                 if (disposing) {
                     DisposeManagedResources();
                 }
