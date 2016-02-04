@@ -74,6 +74,7 @@
     <Compile Include="DisposableObject.cs" />
     <Compile Include="LittleEndianBitConverter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ViewModelBase.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

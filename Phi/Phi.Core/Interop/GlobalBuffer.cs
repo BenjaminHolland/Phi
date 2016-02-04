@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 using System.Diagnostics;
 namespace Phi.Core.Interop {
+    /// <summary>
+    /// Provides a safe wrapper around a segment of unmanaged memory. Provides a constructor that allows for the segment to be aligned on arbitrary byte boundries.
+    /// </summary>
     public sealed class GlobalBuffer : SafeBuffer {
         private IntPtr _raw;
         public GlobalBuffer(int size)

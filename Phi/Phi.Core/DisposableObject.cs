@@ -28,7 +28,19 @@ namespace Phi.Core {
         event EventHandler<DisposedEventArgs> Disposed;
     }
 
+    public static class IDisposableExt
+    {
+        public static IDisposableObject ToDisposableObject(this IDisposable self)
+        {
+            return new DisposalWrapper(self);
+        }
+        public static IDisposableObject ToDisposableObject(this IDisposable self, Action unmanagedDisposal)
+        {
+            return new DisposalWrapper(self.Dispose, unmanagedDisposal);
+        }
+    }
     public sealed class DisposalWrapper : DisposableObject {
+        
         private Action _managedDisposal;
         private Action _unmanagedDisposal;
         public DisposalWrapper(IDisposable target) {

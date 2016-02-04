@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Phi.Core;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Management;
@@ -6,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Phi.IO.Devices {
-    public sealed class DriveProvider : IDisposable {
+    public sealed class DriveProvider : DisposableObject{
         #region Lifetime
         private static Lazy<DriveProvider> _instance = new Lazy<DriveProvider>(() => new DriveProvider());
         public static DriveProvider Current {
@@ -21,17 +22,12 @@ namespace Phi.IO.Devices {
             _queryLogicalDiskToPartition = new ManagementObjectSearcher(@"\root\cimv2", "SELECT * FROM Win32_LogicalDiskToPartition");
 
         }
-        private void _throwIfDisposed() {
-            if (_isDisposed) throw new ObjectDisposedException(this.ToString());
-        }
-        private bool _isDisposed;
-        public void Dispose() {
-            if (_isDisposed) return;
+        protected override void DisposeManagedResources()
+        {
             _queryLogicalDisk.Dispose();
             _queryLogicalDiskToPartition.Dispose();
             _queryPhysicalDisk.Dispose();
             _queryPhysicalDiskToPartition.Dispose();
-            _isDisposed = true;
         }
         #endregion
         #region Queries
@@ -43,6 +39,7 @@ namespace Phi.IO.Devices {
 
         public IEnumerable<ManagementPath> LogicalDisks {
             get {
+                ThrowIfDisposed();
                 using (var objects = _queryLogicalDisk.Get())
                     foreach (var mo in objects) {
                         yield return (mo as ManagementObject)?.Path;
@@ -52,6 +49,7 @@ namespace Phi.IO.Devices {
         }
         public IEnumerable<ManagementPath> PhysicalDisks {
             get {
+                ThrowIfDisposed();
                 using (var objects = _queryPhysicalDisk.Get())
                     foreach (var mo in objects) {
                         yield return (mo as ManagementObject)?.Path;
@@ -62,6 +60,7 @@ namespace Phi.IO.Devices {
 
         public IEnumerable<ManagementPath> MapLogicalToPartition {
             get {
+                ThrowIfDisposed();
                 using (var objects = _queryLogicalDiskToPartition.Get()) {
                     foreach (var mo in objects) {
                         yield return (mo as ManagementObject)?.Path;
@@ -72,6 +71,7 @@ namespace Phi.IO.Devices {
         }
         public IEnumerable<ManagementPath> MapPhysicalToPartition {
             get {
+                ThrowIfDisposed();
                 using (var objects = _queryPhysicalDiskToPartition.Get()) {
                     foreach (var mo in objects) {
                         yield return (mo as ManagementObject).Path;
@@ -82,7 +82,7 @@ namespace Phi.IO.Devices {
         }
         public IEnumerable<IGrouping<ManagementPath, ManagementPath>> LogicalDisksByPhysicalDisk {
             get {
-
+                ThrowIfDisposed();
                 var ql2p = from path in MapLogicalToPartition select new ManagementObject(path);
                 var qp2p = from path in MapPhysicalToPartition select new ManagementObject(path);
                 var disposeList = ql2p.Concat(qp2p);

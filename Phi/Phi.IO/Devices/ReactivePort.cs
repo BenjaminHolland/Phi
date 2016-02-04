@@ -9,9 +9,11 @@ using System.Reactive;
 using System.Reactive.Subjects;
 using System.Reactive.Linq;
 using System.Reactive.Concurrency;
+using Phi.Core;
+
 namespace Phi.IO.Devices
 {
-    public sealed class ReactivePort : IDisposable {
+    public sealed class ReactivePort : DisposableObject {
         private SerialPortStream _port;
         #region Received Infrastructure
         private sealed class ReceivedGeneratorState {
@@ -158,9 +160,16 @@ namespace Phi.IO.Devices
         #region Lifetime
         private bool _isDisposed;
         public ReactivePort() {
+            //Create the underlying serial connection.
             _port = new SerialPortStream();
+            //Create a subject that will manage the distribution of the received messages.
             _receivedSubject = new Subject<ReactivePortPacket>();
+
+            //Create the state the received generator will use.
             _receivedGeneratorState = new ReceivedGeneratorState(this);
+
+            //Create a message generator that polls the serial port for data and sends a new message either when a read times out, or when a \n is detected.
+            //Make sure this generator runs on a different thread so we don't block. There should be a way to make this async, but I'm not sure how.
             _receivedGenerator = Observable
                 .Generate(
                     _receivedGeneratorState,
@@ -168,20 +177,26 @@ namespace Phi.IO.Devices
                     state => state,
                     _receivedLoopBody,
                     NewThreadScheduler.Default);
+            //Create a subject that will dispatch data written to the port.
             _sentSubject = new Subject<ReactivePortPacket>();
         }
-        public void Dispose() {
-            if (_isDisposed) return;
+        protected override void DisposeManagedResources()
+        {
+            //Disconnect the recieved subject from the received generator so we stop processing messages.
             Close();
+            
+            //Notify our subscribers that the port has finished sending data.
             _receivedSubject.OnCompleted();
             _sentSubject.OnCompleted();
 
+            //Shutdown the recieved generator.
             _receivedGeneratorState.Shutdown();
+
+            //Wait till the generator stops.
             SpinWait.SpinUntil(_receivedGenerator.IsEmpty().Wait);
 
-            Console.WriteLine("Shutdown Complete");
+            //Dispose our underlying serial port.
             _port.Dispose();
-            _isDisposed = true;
         }
         #endregion
 
@@ -259,6 +274,7 @@ namespace Phi.IO.Devices
 
         public bool BreakState {
             get {
+
                 return _port.BreakState;
             }
             set {
@@ -268,6 +284,7 @@ namespace Phi.IO.Devices
 
         public int BaudRate {
             get {
+
                 return _port.BaudRate;
             }
             set {
@@ -276,6 +293,7 @@ namespace Phi.IO.Devices
         }
         public string PortName {
             get {
+
                 return _port.PortName;
             }
             set {
@@ -284,15 +302,31 @@ namespace Phi.IO.Devices
         }
         public bool IsOpen {
             get {
+                ThrowIfDisposed();
                 return _port.IsOpen;
             }
         }
+        /// <summary>
+        /// Opens the port.
+        /// </summary>
+        /// <remarks>
+        /// Internally, all this does is attach the message generator to the Received subject and open the underlying port.
+        /// it does not stop the received generator.
+        /// </remarks>
+
         public void Open() {
+            ThrowIfDisposed();
             if (_port.IsOpen) return;
             _port.Open();
             _receivedSub = _receivedGenerator.Subscribe(_receivedSubject);
         }
+        /// <summary>
+        /// Closes the port.
+        /// </summary>
+        /// <remarks>
+        /// Internally, simply disconnects the received subject from the received generator.</remarks>
         public void Close() {
+            ThrowIfDisposed();
             if (!_port.IsOpen) return;
             _receivedSub.Dispose();
             _port.Close();

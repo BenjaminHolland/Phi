@@ -5,6 +5,17 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Phi.Core {
+    public static class ByteArrayExt
+    {
+        public static BitView CreateBitView(this byte[] source,int bitOffset,int bitLength)
+        {
+            return new BitView(source, bitOffset, bitLength);
+        }
+        public static string ToHexString(this byte[] source)
+        {
+            return string.Join("", source.Select(b => b.ToString("X2")));
+        }
+    }
     public sealed class BitView {
         private byte[] _bytes;
         private int _bitOffset;
