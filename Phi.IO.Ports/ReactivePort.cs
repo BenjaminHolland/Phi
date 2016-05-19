@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Phi.IO.Ports
 {
-    public sealed class ReactivePort:IDisposable
+    public sealed class ReactivePort : IDisposable
     {
         private SerialPortStream _port;
         #region Received Infrastructure
@@ -182,7 +182,7 @@ namespace Phi.IO.Ports
         #endregion
 
         #region Lifetime
-        private bool _isDisposed;
+
         public ReactivePort()
         {
             //Create the underlying serial connection.
@@ -232,6 +232,7 @@ namespace Phi.IO.Ports
         {
             if (IsDisposed) throw new ObjectDisposedException("this");
         }
+        #endregion
         #region Output
         public IObservable<byte[]> Sent
         {
@@ -270,7 +271,7 @@ namespace Phi.IO.Ports
         {
             _port.DiscardOutBuffer();
         }
-       
+
         public void Write(byte[] buffer, int offset, int count)
         {
             if (!_port.IsOpen) return;
@@ -400,6 +401,6 @@ namespace Phi.IO.Ports
             _port.Close();
         }
 
-  
+
     }
 }
