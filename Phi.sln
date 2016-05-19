@@ -17,6 +17,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Phi.BitView", "Phi.BitView\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Phi.Interop", "Phi.Interop\Phi.Interop.csproj", "{E4907A32-C3D9-4F2C-B91F-8B191222F7DD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Phi.IO.Ports", "Phi.IO.Ports\Phi.IO.Ports.csproj", "{BE7DCD08-D08B-4D90-96FF-78429FB8D573}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -51,6 +53,10 @@ Global
 		{E4907A32-C3D9-4F2C-B91F-8B191222F7DD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E4907A32-C3D9-4F2C-B91F-8B191222F7DD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E4907A32-C3D9-4F2C-B91F-8B191222F7DD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BE7DCD08-D08B-4D90-96FF-78429FB8D573}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BE7DCD08-D08B-4D90-96FF-78429FB8D573}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BE7DCD08-D08B-4D90-96FF-78429FB8D573}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BE7DCD08-D08B-4D90-96FF-78429FB8D573}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
