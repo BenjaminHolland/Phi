@@ -176,13 +176,10 @@ namespace Phi.IO.Ports
         private Subject<byte[]> _receivedSubject;
         private IDisposable _receivedSub;
         #endregion
-
         #region Sent Infrastructure
         private Subject<byte[]> _sentSubject;
         #endregion
-
         #region Lifetime
-
         public ReactivePort()
         {
             //Create the underlying serial connection.
